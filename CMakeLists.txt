@@ -1,37 +1,37 @@
 cmake_minimum_required(VERSION 2.6)
-project( LibOVR )
+project(LibOVR)
 
 add_definitions(-DUNICODE -D_UNICODE -DMINGW_HAS_SECURE_API -DNOMINMAX)
-
-include_directories( LibOVR/Include LibOVR/Src ${CMAKE_CURRENT_SOURCE_DIR} )
+add_definitions(-DOVR_BUILD_SHIPPING)
+# add_definitions(-DOVR_DLL_BUILD) # shared only
 
 file(GLOB LIBOVR_FILES
-    LibOVR/Include/*.h
-    LibOVR/Include/Extras/*.h
-    LibOVR/Src/*.cpp
-    LibOVR/Src/*.c
+        LibOVR/Include/*.h
+        LibOVR/Include/Extras/*.h
+        LibOVR/Src/*.cpp
+        LibOVR/Src/*.c
 
-    LibOVRKernel/*/*/*.cpp
-    LibOVRKernel/*/*/*.c
-    LibOVRKernel/*/*/*.h
+        LibOVRKernel/*/*/*.cpp
+        LibOVRKernel/*/*/*.c
+        LibOVRKernel/*/*/*.h
 
-    Logging/src/*.cpp
-    Logging/src/internal/*.cpp
-    Logging/src/include/*.h
-)
+        Logging/src/*.cpp
+        Logging/src/internal/*.cpp
+        Logging/src/include/*.h
+        )
 
-file(GLOB includes LibOVRKernel/Src/*/)
+add_library(LibOVR STATIC ${LIBOVR_FILES})
 
-include_directories(${includes} LibOVRKernel/Src)
+target_include_directories(LibOVR PUBLIC LibOVR/Include Logging/Include)
+target_include_directories(LibOVR PRIVATE LibOVR/Src)
+
+file(GLOB OVR_KERNEL_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/LibOVRKernel/Src/*/")
+
+target_include_directories(LibOVR PRIVATE ${OVR_KERNEL_INCLUDES} LibOVRKernel/Src)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR APPLE)
     set(CMAKE_CXX_FLAGS " -std=c++11 ${CMAKE_CXX_FLAGS} -fpermissive ")
 endif()
-
-add_definitions(-DOVR_BUILD_SHIPPING)
-
-# add_definitions(-DOVR_DLL_BUILD) # shared only
-add_library( LibOVR STATIC ${LIBOVR_FILES} )
 
 if(WIN32)
     target_link_libraries(

@@ -27,7 +27,7 @@ limitations under the License.
 #ifndef Logging_OutputPlugins_h
 #define Logging_OutputPlugins_h
 
-#include "../include/Logging_Library.h"
+#include "Logging_Library.h"
 
 namespace ovrlog {
 
@@ -38,16 +38,23 @@ namespace ovrlog {
 // Console window output (colorized)
 // Prints at stdout level, even for errors.
 // This takes about 3 milliseconds per message in debug mode.
-
 class OutputConsole : public OutputPlugin
 {
 public:
-    OutputConsole();
+    OutputConsole(bool useStdio = false);
     ~OutputConsole();
+
+    // If true then use stdio for output instead of platform-savvy calls.
+    void SetStdioUsage(bool enable);
 
 private:
     virtual const char* GetUniquePluginName() override;
     virtual void Write(Level level, const char* subsystem, const char* header, const char* utf8msg) override;
+
+    // If enabled then we use stdio instead of platform-specific calls. By default we 
+    // use direct platform calls because they are lower overhead and because (for Windows)
+    // they are UTF8-savvy (unlike stdio on Windows). Defaults to false.
+	  bool UseStdio;
 };
 
 
@@ -82,8 +89,14 @@ public:
     ~OutputEventLog();
 
 private:
+    #if defined(_WIN32)
+        typedef HANDLE EventSourceHandle;
+    #else
+        typedef void* EventSourceHandle;
+    #endif
+    
     // Event source handle initialized in constructor and used for logging
-    HANDLE hEventSource;
+    EventSourceHandle hEventSource;
     Level  MinReportEventLevel;
 
     virtual const char* GetUniquePluginName() override;
