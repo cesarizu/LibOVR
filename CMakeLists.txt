@@ -3,7 +3,7 @@ project( LibOVR )
 
 add_definitions(-DUNICODE -D_UNICODE -DMINGW_HAS_SECURE_API -DNOMINMAX)
 
-include_directories( LibOVR/Include LibOVR/Src ${CMAKE_SOURCE_DIR} )
+include_directories( LibOVR/Include LibOVR/Src ${CMAKE_CURRENT_SOURCE_DIR} )
 
 file(GLOB LIBOVR_FILES
     LibOVR/Include/*.h
@@ -40,12 +40,12 @@ if(WIN32)
     )
 endif()
 
-file(COPY "${CMAKE_SOURCE_DIR}/LibOVR/Include"
-     DESTINATION "${CMAKE_BINARY_DIR}")
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/LibOVR/Include"
+     DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
 #install(DIRECTORY "LibOVR/Include" DESTINATION .)
 #install(TARGETS LibOVR DESTINATION .)
 
-if(",${CMAKE_BINARY_DIR}" STREQUAL ",")
-    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "" FORCE)
+if(",${CMAKE_CURRENT_BINARY_DIR}" STREQUAL ",")
+    set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/install" CACHE PATH "" FORCE)
 endif()
